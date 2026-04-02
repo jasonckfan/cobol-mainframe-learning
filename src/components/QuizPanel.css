@@ -242,23 +242,78 @@
   color: var(--color-text-secondary);
 }
 
-/* Responsive */
+/* Mobile Responsive - iPhone Safari */
 @media (max-width: 768px) {
-  .question-text {
-    font-size: 1.1rem;
-  }
-  
-  .quiz-option {
+  .quiz-panel {
     padding: var(--spacing-sm);
   }
   
+  .quiz-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+  }
+  
+  .question-text {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .quiz-options {
+    gap: var(--spacing-sm);
+  }
+  
+  .quiz-option {
+    padding: var(--spacing-md);
+    min-height: 60px;
+  }
+  
   .option-letter {
-    width: 28px;
-    height: 28px;
-    font-size: 0.875rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  
+  .option-text {
+    font-size: 0.9rem;
+  }
+  
+  .quiz-explanation {
+    padding: var(--spacing-md);
+  }
+  
+  .btn-primary {
+    width: 100%;
+    padding: var(--spacing-md);
+    min-height: 48px;
+  }
+  
+  .quiz-finished {
+    min-height: auto;
+    padding: var(--spacing-md) 0;
+  }
+  
+  .quiz-result-card {
+    padding: var(--spacing-xl);
+    margin: 0 var(--spacing-sm);
   }
   
   .score-number {
     font-size: 3rem;
+  }
+  
+  .result-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* Small phones */
+@media (max-width: 375px) {
+  .question-text {
+    font-size: 0.95rem;
+  }
+  
+  .option-text {
+    font-size: 0.85rem;
   }
 }
