@@ -1,0 +1,171 @@
+/* CodeBlock Component Styles */
+
+.code-block-container {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Header */
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.code-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.code-lang {
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.code-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.code-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.code-action {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.code-action:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.code-action.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+/* Code Content */
+.code-content {
+  background-color: #0d1117;
+  overflow-x: auto;
+}
+
+.code-pre {
+  margin: 0;
+  padding: var(--spacing-md);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.code-line {
+  display: flex;
+  align-items: flex-start;
+}
+
+.line-number {
+  color: #484f58;
+  min-width: 3ch;
+  text-align: right;
+  padding-right: var(--spacing-md);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.line-content {
+  color: #e6edf3;
+  white-space: pre;
+  flex: 1;
+  position: relative;
+}
+
+/* Syntax Highlighting - COBOL */
+.language-cobol .line-content {
+  color: #e6edf3;
+}
+
+/* Comments */
+.line-content:contains("*") {
+  color: #8b949e;
+}
+
+/* JCL specific */
+.language-jcl .line-content {
+  color: #e6edf3;
+}
+
+.language-jcl .line-content[data-starts-with="//"] {
+  color: #7ee787;
+}
+
+/* Line Annotation */
+.line-annotation {
+  position: absolute;
+  right: 0;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-terminal);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  margin-left: var(--spacing-lg);
+  white-space: nowrap;
+  border: 1px solid var(--color-border);
+}
+
+/* Explanation */
+.code-explanation {
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.explanation-title {
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-primary);
+}
+
+.explanation-text {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .code-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+  }
+  
+  .code-pre {
+    font-size: 0.75rem;
+    padding: var(--spacing-sm);
+  }
+  
+  .line-annotation {
+    display: none;
+  }
+}

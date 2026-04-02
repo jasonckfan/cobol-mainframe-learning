@@ -1,0 +1,164 @@
+/* Scenario List Page Styles */
+
+.scenario-list {
+  padding-bottom: var(--spacing-2xl);
+}
+
+.page-header {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-title {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.page-desc {
+  color: var(--color-text-secondary);
+}
+
+/* Stage Section */
+.stage-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+  padding-left: var(--spacing-md);
+  border-left: 4px solid;
+  margin-bottom: var(--spacing-lg);
+}
+
+.stage-badge {
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.stage-title {
+  font-size: 1.25rem;
+  flex: 1;
+}
+
+.stage-count {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Scenarios Grid */
+.scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.scenario-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  background-color: var(--color-bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s;
+}
+
+.scenario-card:hover {
+  border-color: var(--color-primary);
+  transform: translateX(4px);
+}
+
+.scenario-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.scenario-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.scenario-title {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-primary);
+}
+
+.scenario-title-en {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: var(--spacing-sm);
+}
+
+.scenario-context {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+}
+
+.scenario-meta {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.scenario-concepts,
+.scenario-dialogues {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg-tertiary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.scenario-arrow {
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  transition: color 0.2s;
+}
+
+.scenario-card:hover .scenario-arrow {
+  color: var(--color-primary-light);
+}
+
+/* Empty Stage */
+.empty-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xl);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.empty-icon {
+  font-size: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .scenarios-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stage-header {
+    flex-wrap: wrap;
+  }
+  
+  .stage-title {
+    font-size: 1.1rem;
+  }
+}
