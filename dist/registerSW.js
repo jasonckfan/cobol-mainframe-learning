@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/cobol-mainframe-learning/sw.js', { scope: '/cobol-mainframe-learning/' })})}

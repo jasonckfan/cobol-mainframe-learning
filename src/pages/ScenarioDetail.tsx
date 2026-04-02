@@ -22,16 +22,6 @@ function ScenarioDetail() {
     )
   }
 
-  const stageNames = [
-    '',
-    'Mainframe 基礎大圖',
-    'COBOL 基礎語法',
-    'JCL 與檔案處理',
-    'CLM 銀行實務',
-    'BA 溝通術',
-    '實戰模擬',
-  ]
-
   return (
     <div className="scenario-detail">
       {/* Header */}

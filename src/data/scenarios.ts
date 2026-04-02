@@ -229,4 +229,11 @@ SUBJECT: CLM Interest Calc Complete
           { id: 'a', text: '即時處理客戶交易' },
           { id: 'b', text: '日終批次處理交易檔並產出報表' },
           { id: 'c', text: '備份系統資料' },
-          { id: 'd', text: '發送電子郵件通知'
+          { id: 'd', text: '發送電子郵件通知' },
+        ],
+        correctAnswer: 'b',
+        explanation: '這是一個 Batch Job（有 JOB statement 和 EXEC PGM），用來處理日終 (EOD) 流程，讀取交易檔並產出報表。',
+      },
+    ],
+  },
+];
