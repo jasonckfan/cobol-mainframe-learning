@@ -310,6 +310,7 @@
   .hero-stats {
     gap: var(--spacing-md);
     flex-wrap: wrap;
+    margin-bottom: var(--spacing-lg);
   }
   
   .stat-number {
@@ -317,14 +318,19 @@
   }
   
   .hero-cta {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: 1rem;
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1.1rem;
     width: 100%;
-    max-width: 280px;
+    max-width: 300px;
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    display: inline-block;
+    text-align: center;
   }
   
   .progress-section {
     padding: var(--spacing-md);
+    margin-top: var(--spacing-xl);
   }
   
   .rec-card {
