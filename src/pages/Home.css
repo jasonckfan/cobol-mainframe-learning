@@ -296,7 +296,7 @@
 /* Mobile Responsive - iPhone Safari */
 @media (max-width: 768px) {
   .hero {
-    padding: var(--spacing-lg) var(--spacing-md);
+    padding: var(--spacing-xl) var(--spacing-md);
     margin: 0 calc(-1 * var(--spacing-md));
     border-radius: 0;
     display: flex;
@@ -306,7 +306,7 @@
   .hero-content {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
   }
   
   .hero-title {
@@ -321,10 +321,10 @@
   }
   
   .hero-stats {
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     flex-wrap: wrap;
-    margin-bottom: var(--spacing-lg);
-    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+    margin-top: 0;
   }
   
   .stat-number {
@@ -335,9 +335,9 @@
     padding: var(--spacing-md) var(--spacing-xl);
     font-size: 1.1rem;
     width: 100%;
-    max-width: 300px;
-    margin-top: var(--spacing-md);
-    margin-bottom: var(--spacing-sm);
+    max-width: 280px;
+    margin-top: 0;
+    margin-bottom: var(--spacing-lg);
     display: inline-block;
     text-align: center;
     position: relative;
@@ -347,8 +347,8 @@
   }
   
   .progress-section {
-    padding: var(--spacing-md);
-    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-2xl);
   }
   
   .rec-card {
