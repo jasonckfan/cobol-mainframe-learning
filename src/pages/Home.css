@@ -295,18 +295,24 @@
 
 /* Mobile Responsive - iPhone Safari */
 @media (max-width: 768px) {
+  .home {
+    gap: var(--spacing-xl);
+  }
+  
   .hero {
-    padding: var(--spacing-xl) var(--spacing-md);
+    padding: var(--spacing-xl) var(--spacing-md) calc(var(--spacing-2xl) + var(--spacing-lg));
     margin: 0 calc(-1 * var(--spacing-md));
     border-radius: 0;
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow: visible;
   }
   
   .hero-content {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-xl);
   }
   
   .hero-title {
@@ -323,7 +329,7 @@
   .hero-stats {
     gap: var(--spacing-lg);
     flex-wrap: wrap;
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
     margin-top: 0;
   }
   
@@ -336,19 +342,20 @@
     font-size: 1.1rem;
     width: 100%;
     max-width: 280px;
-    margin-top: 0;
-    margin-bottom: var(--spacing-lg);
+    margin-top: var(--spacing-sm);
+    margin-bottom: calc(-1 * var(--spacing-2xl));
     display: inline-block;
     text-align: center;
     position: relative;
-    z-index: 2;
-    clear: both;
+    z-index: 10;
     align-self: center;
   }
   
   .progress-section {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-md);
     margin-top: var(--spacing-2xl);
+    position: relative;
+    z-index: 5;
   }
   
   .rec-card {
