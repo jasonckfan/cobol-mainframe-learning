@@ -17,8 +17,7 @@
 .header {
   background-color: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
   padding-top: var(--safe-top);
 }
@@ -167,8 +166,7 @@
 /* Mobile Responsive - iPhone Safari */
 @media (max-width: 768px) {
   .header {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 100;
   }
   
