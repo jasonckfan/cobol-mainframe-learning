@@ -10,12 +10,19 @@ function Layout({ children }: LayoutProps) {
   
   const navItems = [
     { path: '/', label: '首頁', icon: '🏠' },
-    { path: '/scenarios', label: '情境學習', icon: '📚' },
-    { path: '/code-lab', label: '程式碼實驗室', icon: '💻' },
+    { path: '/scenarios', label: '情境', icon: '📚' },
+    { path: '/code-lab', label: '實驗室', icon: '💻' },
     { path: '/quiz', label: '測驗', icon: '📝' },
-    { path: '/glossary', label: '術語詞典', icon: '🔍' },
+    { path: '/glossary', label: '詞典', icon: '🔍' },
     { path: '/progress', label: '進度', icon: '📊' },
   ]
+
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/'
+    }
+    return location.pathname.startsWith(path)
+  }
 
   return (
     <div className="layout">
@@ -23,20 +30,8 @@ function Layout({ children }: LayoutProps) {
         <div className="header-content">
           <Link to="/" className="logo">
             <span className="logo-icon">🖥️</span>
-            <span className="logo-text">COBOL Mainframe Learning</span>
+            <span className="logo-text">COBOL</span>
           </Link>
-          <nav className="nav">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
-              >
-                <span className="nav-icon">{item.icon}</span>
-                <span className="nav-label">{item.label}</span>
-              </Link>
-            ))}
-          </nav>
         </div>
       </header>
       
@@ -46,14 +41,18 @@ function Layout({ children }: LayoutProps) {
         </div>
       </main>
       
-      <footer className="footer">
-        <div className="footer-content">
-          <p className="footer-text">
-            <span className="terminal-text">$</span> Learn COBOL & Mainframe for Banking
-          </p>
-          <p className="footer-version">v1.0.0</p>
-        </div>
-      </footer>
+      <nav className="bottom-nav">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`bottom-nav-item ${isActive(item.path) ? 'active' : ''}`}
+          >
+            <span className="bottom-nav-icon">{item.icon}</span>
+            <span className="bottom-nav-label">{item.label}</span>
+          </Link>
+        ))}
+      </nav>
     </div>
   )
 }
