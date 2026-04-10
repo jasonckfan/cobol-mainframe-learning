@@ -551,4 +551,232 @@ SUBJECT: CLM Interest Calc Complete
       },
     ],
   },
+
+
+  // ========== 第 2 階段：COBOL 程式結構 (新增 2026-04-10) ==========
+  {
+    id: 'cobol-structure',
+    title: 'COBOL 程式結構',
+    titleEn: 'COBOL Program Structure',
+    icon: '📐',
+    stage: 2,
+    context: '了解 COBOL 程式的四大 DIVISION',
+    contextEn: 'Understanding the four DIVISIONs of COBOL programs',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'dev', name: '程式設計師', nameEn: 'Developer', avatar: '💻' },
+    ],
+    concepts: [
+      {
+        term: 'DIVISION',
+        termEn: 'DIVISION',
+        explanation: 'COBOL 程式分為四大區塊：IDENTIFICATION、ENVIRONMENT、DATA、PROCEDURE',
+        analogy: '就像寫一本書：封面資訊、出版環境、目錄索引、正文內容',
+      },
+      {
+        term: 'IDENTIFICATION DIVISION',
+        termEn: 'IDENTIFICATION DIVISION',
+        explanation: '程式的身份識別區，包含程式名稱、作者、日期等資訊',
+        analogy: '就像書的封面，寫明書名和作者',
+      },
+      {
+        term: 'DATA DIVISION',
+        termEn: 'DATA DIVISION',
+        explanation: '定義程式中使用的所有變數和資料結構',
+        analogy: '就像書的目錄和索引，定義所有會用到的資料',
+      },
+      {
+        term: 'PROCEDURE DIVISION',
+        termEn: 'PROCEDURE DIVISION',
+        explanation: '程式的邏輯處理區，包含所有的執行指令',
+        analogy: '就像書的正文章節，實際的內容和流程',
+      },
+    ],
+    dialogues: [
+      { roleId: 'ba', text: 'COBOL 程式看起來很長，有什麼結構規則嗎？' },
+      { roleId: 'dev', text: 'COBOL 有固定的四大 DIVISION，就像寫文章要有標題、前言、正文、結語。' },
+      { roleId: 'dev', text: '第一個是 IDENTIFICATION DIVISION，寫程式名稱和基本資訊。' },
+      { roleId: 'ba', text: '那 ENVIRONMENT DIVISION 呢？' },
+      { roleId: 'dev', text: '那是環境設定，告訴系統這支程式要在哪台機器跑、用什麼檔案。' },
+      { roleId: 'dev', text: 'DATA DIVISION 最重要，定義所有變數。就像 VBA 的 Dim 宣告，但要詳細得多。' },
+      { roleId: 'ba', text: 'PIC 是什麼意思？' },
+      { roleId: 'dev', text: 'PIC (Picture) 定義資料格式。例如 PIC 9(5) 是 5 位數字，PIC X(20) 是 20 個字元。' },
+      { roleId: 'dev', text: '最後 PROCEDURE DIVISION 是邏輯區，寫 IF、PERFORM、MOVE 等指令。' },
+      { roleId: 'ba', text: '了解了！就像 VBA 的 Sub 裡面寫程式碼。' },
+    ],
+    codeExamples: [
+      {
+        title: '完整 COBOL 程式結構',
+        language: 'cobol',
+        code: `       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CLMINTRT.
+       AUTHOR.  JASON FAN.
+       DATE-WRITTEN.  2026-04-10.
+      * CALCULATE INTEREST FOR CLM ACCOUNTS
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT ACCT-FILE ASSIGN TO ACCTFILE.
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ACCT-FILE.
+       01  ACCT-RECORD.
+           05  ACCT-KEY          PIC X(10).
+           05  ACCT-BALANCE      PIC S9(13)V99 COMP-3.
+       WORKING-STORAGE SECTION.
+       01  WS-EOF            PIC X VALUE 'N'.
+       PROCEDURE DIVISION.
+       0000-MAIN.
+           OPEN INPUT ACCT-FILE
+           PERFORM UNTIL WS-EOF = 'Y'
+               READ ACCT-FILE NEXT RECORD
+                   AT END MOVE 'Y' TO WS-EOF
+                   NOT AT END DISPLAY ACCT-KEY
+               END-READ
+           END-PERFORM
+           CLOSE ACCT-FILE
+           STOP RUN.`,
+        explanation: 'COBOL 程式必須依序包含 IDENTIFICATION、ENVIRONMENT、DATA、PROCEDURE 四個 DIVISION',
+        annotations: [
+          { line: 1, text: 'IDENTIFICATION DIVISION：程式識別資訊' },
+          { line: 5, text: 'ENVIRONMENT DIVISION：環境設定' },
+          { line: 9, text: 'DATA DIVISION：資料定義區' },
+          { line: 15, text: 'PROCEDURE DIVISION：邏輯處理區' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q4-1',
+        type: 'single',
+        question: 'COBOL 程式中，定義變數的 DIVISION 是哪一個？',
+        options: [
+          { id: 'a', text: 'IDENTIFICATION DIVISION' },
+          { id: 'b', text: 'ENVIRONMENT DIVISION' },
+          { id: 'c', text: 'DATA DIVISION' },
+          { id: 'd', text: 'PROCEDURE DIVISION' },
+        ],
+        correctAnswer: 'c',
+        explanation: 'DATA DIVISION 用於定義程式中使用的所有資料和變數。',
+      },
+    ],
+  },
+
+  // ========== 第 2 階段：COBOL 資料型別 (新增 2026-04-10) ==========
+  {
+    id: 'cobol-data-types',
+    title: 'COBOL 資料型別',
+    titleEn: 'COBOL Data Types',
+    icon: '🔢',
+    stage: 2,
+    context: '學習 PIC 定義與 COMP-3 壓縮格式',
+    contextEn: 'Learning PIC definitions and COMP-3 packed format',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'dev', name: '程式設計師', nameEn: 'Developer', avatar: '💻' },
+    ],
+    concepts: [
+      {
+        term: 'PIC (Picture)',
+        termEn: 'PIC Clause',
+        explanation: '定義資料欄位的格式和長度，9 代表數字，X 代表字元，V 代表隱含小數點',
+        analogy: '就像 Excel 的儲存格格式設定：數字、文字、貨幣',
+      },
+      {
+        term: 'COMP-3 (Packed Decimal)',
+        termEn: 'COMP-3',
+        explanation: '壓縮十進位格式，每個數字佔 4 bits，最後一個 byte 存符號，節省空間',
+        analogy: '就像把兩個數字「塞」進一個 byte，省空間但計算時要解壓',
+      },
+      {
+        term: 'S9',
+        termEn: 'Signed Numeric',
+        explanation: '帶符號的數字，S 表示正負號，通常與 COMP-3 一起使用',
+        analogy: '就像 Excel 的會計格式，可以顯示正負數',
+      },
+      {
+        term: 'FILLER',
+        termEn: 'FILLER',
+        explanation: '佔位用的欄位，程式中不會使用，用於對齊或保留空間',
+        analogy: '就像文件中的空白行，佔位置但沒有內容',
+      },
+    ],
+    dialogues: [
+      { roleId: 'ba', text: '我看到的 Copybook 裡有很多 PIC 9、PIC X，這是什麼意思？' },
+      { roleId: 'dev', text: 'PIC 是 Picture 的縮寫，定義資料格式。PIC 9 是數字，PIC X 是字元。' },
+      { roleId: 'dev', text: '例如 PIC 9(13)V99 表示 13 位整數、2 位小數的數字，V 是隱含的小數點。' },
+      { roleId: 'ba', text: '那 COMP-3 是什麼？' },
+      { roleId: 'dev', text: 'COMP-3 是壓縮格式，把兩個數字「塞」進一個 byte，最後一個 byte 存正負號。' },
+      { roleId: 'dev', text: '銀行系統常用 COMP-3 存金額，因為省空間又精確。' },
+      { roleId: 'ba', text: 'S9 又是什麼？' },
+      { roleId: 'dev', text: 'S 表示 Signed（帶符號），可以存正負數。例如帳戶餘額可能是負數（透支）。' },
+      { roleId: 'dev', text: '所以 PIC S9(13)V99 COMP-3 就是：帶符號的 13 位整數 2 位小數，壓縮格式。' },
+      { roleId: 'ba', text: '了解了！這樣看 Copybook 就清楚多了。' },
+    ],
+    codeExamples: [
+      {
+        title: 'COBOL 資料型別範例',
+        language: 'cobol',
+        code: `       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+      * 字元型別
+       01  WS-CUST-NAME      PIC X(50).
+       01  WS-ACCT-NO        PIC X(10).
+      * 數字型別
+       01  WS-AGE            PIC 9(03).
+       01  WS-COUNT          PIC 9(05) VALUE 0.
+      * 帶符號壓縮數字（常用於金額）
+       01  WS-BALANCE        PIC S9(13)V99 COMP-3.
+       01  WS-INTEREST       PIC S9(09)V999 COMP-3.
+      * 隱含小數點
+       01  WS-RATE           PIC 9V9999.
+      * 條件名稱 (88 Level)
+       01  WS-STATUS         PIC X(02).
+           88  SUCCESS       VALUE '00'.
+           88  NOT-FOUND     VALUE '01'.
+           88  ERROR         VALUE '99'.
+      * FILLER 佔位
+       01  WS-HEADER.
+           05  FILLER        PIC X(10) VALUE '=========='.
+           05  WS-TITLE      PIC X(20).
+           05  FILLER        PIC X(10) VALUE '=========='.`,
+        explanation: 'PIC 定義資料格式，COMP-3 是壓縮十進位，S9 是帶符號數字，FILLER 是佔位欄位',
+        annotations: [
+          { line: 4, text: 'PIC X：字元型別' },
+          { line: 8, text: 'PIC 9：數字型別' },
+          { line: 11, text: 'S9 COMP-3：帶符號壓縮數字' },
+          { line: 16, text: '88 Level：條件名稱' },
+          { line: 22, text: 'FILLER：佔位用欄位' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q5-1',
+        type: 'single',
+        question: 'PIC S9(13)V99 COMP-3 適合用來儲存什麼資料？',
+        options: [
+          { id: 'a', text: '客戶姓名' },
+          { id: 'b', text: '帳戶餘額（可能為負數）' },
+          { id: 'c', text: '帳號' },
+          { id: 'd', text: '日期格式' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'S9 表示帶符號數字（可正可負），V99 表示 2 位小數，COMP-3 是壓縮格式，適合儲存金額。',
+      },
+      {
+        id: 'q5-2',
+        type: 'single',
+        question: 'COMP-3 的主要優點是什麼？',
+        options: [
+          { id: 'a', text: '計算速度更快' },
+          { id: 'b', text: '節省儲存空間' },
+          { id: 'c', text: '更容易閱讀' },
+          { id: 'd', text: '支援更多小數位' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'COMP-3 把兩個數字壓縮到一個 byte，最後一個 byte 存符號，可以節省約一半的儲存空間。',
+      },
+    ],
+  },
 ];
