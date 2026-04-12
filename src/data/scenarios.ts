@@ -1350,4 +1350,214 @@ SUBJECT: CLM Interest Calc Complete
       },
     ],
   },
+
+  // ========== 第 3 階段：VSAM 檔案處理 (新增 2026-04-12) ==========
+  {
+    id: 'vsam-files',
+    title: 'VSAM 檔案處理',
+    titleEn: 'VSAM File Processing',
+    icon: '🗂️',
+    stage: 3,
+    context: '學習 VSAM 檔案類型與存取方式',
+    contextEn: 'Learning VSAM file types and access methods',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'dev', name: '程式設計師', nameEn: 'Developer', avatar: '💻' },
+    ],
+    concepts: [
+      {
+        term: 'VSAM (Virtual Storage Access Method)',
+        termEn: 'VSAM',
+        explanation: 'IBM 大型主機的虛擬儲存存取方法，提供高效的索引檔案存取',
+        analogy: '就像資料庫的索引表，可以快速找到任何一筆資料',
+      },
+      {
+        term: 'KSDS (Key-Sequenced Data Set)',
+        termEn: 'KSDS',
+        explanation: '按鍵值排序的資料集，最常用的 VSAM 類型，支援隨機和循序存取',
+        analogy: '就像按學號排序的學生名冊，可以快速查到任何學生',
+      },
+      {
+        term: 'ESDS (Entry-Sequenced Data Set)',
+        termEn: 'ESDS',
+        explanation: '按輸入順序儲存的資料集，只有 RBA (相對位址)，沒有鍵值',
+        analogy: '就像日誌檔案，按時間順序記錄，沒有索引',
+      },
+      {
+        term: 'RRDS (Relative Record Data Set)',
+        termEn: 'RRDS',
+        explanation: '相對記錄資料集，用記錄號碼直接存取，類似陣列',
+        analogy: '就像飯店的房號，可以直接用號碼找到房間',
+      },
+    ],
+    dialogues: [
+      { roleId: 'ba', text: 'VSAM 是什麼？跟一般檔案有什麼不同？' },
+      { roleId: 'dev', text: 'VSAM 是 IBM 主機的特殊檔案格式，有索引機制，可以快速存取資料。' },
+      { roleId: 'dev', text: '銀行系統幾乎都用 VSAM，因為 Online 交易需要快速查詢。' },
+      { roleId: 'ba', text: 'KSDS、ESDS、RRDS 有什麼差別？' },
+      { roleId: 'dev', text: 'KSDS 最常用，有鍵值索引，可以隨機查詢。帳戶主檔通常用 KSDS。' },
+      { roleId: 'dev', text: 'ESDS 沒有鍵值，像日誌檔案，只能循序讀取。交易記錄常用 ESDS。' },
+      { roleId: 'dev', text: 'RRDS 用記錄號碼直接存取，類似陣列，比較少用。' },
+      { roleId: 'ba', text: 'BA 在設計時要注意什麼？' },
+      { roleId: 'dev', text: '要選擇適合的 VSAM 類型。需要隨機查詢用 KSDS，純粹記錄用 ESDS。' },
+      { roleId: 'dev', text: '還要注意鍵值的設計，一旦決定就很難改變，影響所有相關程式。' },
+    ],
+    codeExamples: [
+      {
+        title: 'KSDS 定義與操作',
+        language: 'cobol',
+        code: `       ENVIRONMENT DIVISION.
+       FILE-CONTROL.
+           SELECT ACCT-FILE ASSIGN TO ACCTFILE
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS ACCT-NO
+               FILE STATUS IS WS-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ACCT-FILE.
+       01  ACCT-RECORD.
+           05  ACCT-NO         PIC X(10).
+           05  ACCT-NAME       PIC X(50).
+           05  ACCT-BALANCE    PIC S9(13)V99 COMP-3.
+
+       WORKING-STORAGE SECTION.
+       01  WS-STATUS         PIC X(02).
+       01  WS-KEY            PIC X(10).
+
+       PROCEDURE DIVISION.
+       0000-MAIN.
+      *    隨機讀取 (Random Read)
+           OPEN INPUT ACCT-FILE
+           MOVE '1234567890' TO WS-KEY
+           READ ACCT-FILE KEY IS WS-KEY
+               INVALID KEY
+                   DISPLAY '帳號不存在'
+               NOT INVALID KEY
+                   DISPLAY '餘額: ' ACCT-BALANCE
+           END-READ
+           CLOSE ACCT-FILE
+
+      *    循序讀取 (Sequential Read)
+           OPEN INPUT ACCT-FILE
+           START ACCT-FILE KEY >= WS-KEY
+               INVALID KEY
+                   DISPLAY '起始位置無效'
+               NOT INVALID KEY
+                   PERFORM UNTIL WS-STATUS = '10'
+                       READ ACCT-FILE NEXT RECORD
+                           AT END
+                               MOVE '10' TO WS-STATUS
+                           NOT AT END
+                               DISPLAY ACCT-NO ' ' ACCT-BALANCE
+                       END-READ
+                   END-PERFORM
+           END-START
+           CLOSE ACCT-FILE
+           STOP RUN.`,
+        explanation: 'KSDS 支援隨機讀取 (READ KEY) 和循序讀取 (START...NEXT)',
+        annotations: [
+          { line: 5, text: 'ACCESS MODE IS DYNAMIC：支援隨機和循序存取' },
+          { line: 6, text: 'RECORD KEY：定義主鍵值' },
+          { line: 25, text: 'START：設定循序讀取的起始位置' },
+          { line: 29, text: 'READ NEXT RECORD：循序讀取下一筆' },
+        ],
+      },
+      {
+        title: 'KSDS 新增與修改',
+        language: 'cobol',
+        code: `       PROCEDURE DIVISION.
+       0000-MAIN.
+      *    新增記錄 (WRITE)
+           OPEN I-O ACCT-FILE
+           MOVE '9999999999' TO ACCT-NO
+           MOVE '新客戶' TO ACCT-NAME
+           MOVE 0 TO ACCT-BALANCE
+           WRITE ACCT-RECORD
+               INVALID KEY
+                   DISPLAY '帳號已存在，無法新增'
+               NOT INVALID KEY
+                   DISPLAY '新增成功'
+           END-WRITE
+           CLOSE ACCT-FILE
+
+      *    修改記錄 (REWRITE)
+           OPEN I-O ACCT-FILE
+           MOVE '1234567890' TO ACCT-NO
+           READ ACCT-FILE KEY IS ACCT-NO
+               INVALID KEY
+                   DISPLAY '找不到帳號'
+               NOT INVALID KEY
+                   ADD 1000 TO ACCT-BALANCE
+                   REWRITE ACCT-RECORD
+                       INVALID KEY
+                           DISPLAY '更新失敗'
+                       NOT INVALID KEY
+                           DISPLAY '餘額已更新: ' ACCT-BALANCE
+                   END-REWRITE
+           END-READ
+           CLOSE ACCT-FILE
+
+      *    刪除記錄 (DELETE)
+           OPEN I-O ACCT-FILE
+           MOVE '8888888888' TO ACCT-NO
+           DELETE ACCT-FILE RECORD
+               INVALID KEY
+                   DISPLAY '找不到要刪除的帳號'
+               NOT INVALID KEY
+                   DISPLAY '刪除成功'
+           END-DELETE
+           CLOSE ACCT-FILE
+           STOP RUN.`,
+        explanation: 'KSDS 支援 WRITE (新增)、REWRITE (修改)、DELETE (刪除) 操作',
+        annotations: [
+          { line: 7, text: 'WRITE：新增新記錄，鍵值必須唯一' },
+          { line: 20, text: 'REWRITE：修改現有記錄，需先 READ 成功' },
+          { line: 35, text: 'DELETE：刪除記錄' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q9-1',
+        type: 'single',
+        question: '銀行系統最常用的 VSAM 類型是什麼？',
+        options: [
+          { id: 'a', text: 'ESDS' },
+          { id: 'b', text: 'KSDS' },
+          { id: 'c', text: 'RRDS' },
+          { id: 'd', text: 'LDS' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'KSDS (Key-Sequenced Data Set) 有鍵值索引，支援隨機查詢，最適合帳戶主檔等需要快速查詢的資料。',
+      },
+      {
+        id: 'q9-2',
+        type: 'single',
+        question: 'KSDS 檔案要修改記錄，應該使用什麼指令？',
+        options: [
+          { id: 'a', text: 'WRITE' },
+          { id: 'b', text: 'REWRITE' },
+          { id: 'c', text: 'UPDATE' },
+          { id: 'd', text: 'MODIFY' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'REWRITE 用於修改現有記錄，必須先 READ 成功才能 REWRITE。WRITE 是用於新增記錄。',
+      },
+      {
+        id: 'q9-3',
+        type: 'code-reading',
+        question: 'ACCESS MODE IS DYNAMIC 的意思是什麼？',
+        options: [
+          { id: 'a', text: '只能循序存取' },
+          { id: 'b', text: '只能隨機存取' },
+          { id: 'c', text: '支援循序和隨機存取' },
+          { id: 'd', text: '只能讀取不能寫入' },
+        ],
+        correctAnswer: 'c',
+        explanation: 'DYNAMIC 模式支援循序 (Sequential) 和隨機 (Random) 兩種存取方式。',
+      },
+    ],
+  },
 ];
