@@ -1560,4 +1560,163 @@ SUBJECT: CLM Interest Calc Complete
       },
     ],
   },
+
+  // ========== 第 4 階段：CLM 資金池基礎 (新增 2026-04-12) ==========
+  {
+    id: 'clm-pool-basics',
+    title: 'CLM 資金池基礎',
+    titleEn: 'CLM Pool Basics',
+    icon: '💰',
+    stage: 4,
+    context: '學習 CLM 資金池管理的基本概念',
+    contextEn: 'Learning CLM cash pool management fundamentals',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'business', name: '業務單位', nameEn: 'Business User', avatar: '💼' },
+    ],
+    concepts: [
+      {
+        term: 'CLM (Cash & Liquidity Management)',
+        termEn: 'CLM',
+        explanation: '企業現金與流動性管理系統，幫助企業集中管理多個帳戶的資金',
+        analogy: '就像家庭記帳本，把全家人的錢集中管理，統一調度',
+      },
+      {
+        term: '資金池 (Cash Pool)',
+        termEn: 'Cash Pool',
+        explanation: '將多個子帳戶的資金集中管理，母帳戶統一調度',
+        analogy: '就像一個大水庫，匯集多條小溪的水，統一分配使用',
+      },
+      {
+        term: '母帳戶 (Master Account)',
+        termEn: 'Master Account',
+        explanation: '資金池的主要帳戶，統一管理所有子帳戶的資金',
+        analogy: '就像家庭的戶長帳戶，家人的錢都匯到這裡統一管理',
+      },
+      {
+        term: '子帳戶 (Sub Account)',
+        termEn: 'Sub Account',
+        explanation: '資金池的成員帳戶，資金會自動上掃或下撥到母帳戶',
+        analogy: '就像家庭成員的零用錢帳戶，多餘的錢會自動匯到戶長那裡',
+      },
+    ],
+    dialogues: [
+      { roleId: 'business', text: '我們想導入資金池管理，可以介紹一下嗎？' },
+      { roleId: 'ba', text: 'CLM 資金池可以幫助企業集中管理多個帳戶的資金，提高資金使用效率。' },
+      { roleId: 'ba', text: '基本概念是設立一個母帳戶，其他子帳戶的資金會自動集中到母帳戶統一管理。' },
+      { roleId: 'business', text: '子帳戶的錢會全部被拿走嗎？' },
+      { roleId: 'ba', text: '不會，可以設定保留額度。例如子帳戶保留 10 萬，超過的部分才上掃到母帳戶。' },
+      { roleId: 'ba', text: '當子帳戶餘額不足時，也可以從母帳戶自動下撥補充。' },
+      { roleId: 'business', text: '這樣有什麼好處？' },
+      { roleId: 'ba', text: '好處很多：資金集中可以統一投資理財、減少閒置資金、降低透支風險、簡化對帳。' },
+      { roleId: 'ba', text: '利息計算也更優惠，因為母帳戶餘額大，通常能享授更好的利率。' },
+      { roleId: 'business', text: '了解了，請幫我們評估導入的可行性。' },
+    ],
+    codeExamples: [
+      {
+        title: 'CLM 資金池主檔結構',
+        language: 'cobol',
+        code: `      * CLM.POOL.MASTER - 資金池主檔 Copybook
+       01  POOL-MASTER-RECORD.
+           05  POOL-ID             PIC X(10).
+           05  POOL-NAME           PIC X(50).
+           05  POOL-CURRENCY       PIC X(03).
+           05  POOL-MASTER-ACCT    PIC X(10).
+           05  POOL-STATUS         PIC X(01).
+               88  POOL-ACTIVE     VALUE 'A'.
+               88  POOL-SUSPENDED  VALUE 'S'.
+               88  POOL-CLOSED     VALUE 'C'.
+           05  POOL-SWEEP-TYPE     PIC X(02).
+               88  SWEEP-ZERO      VALUE 'Z0'.
+               88  SWEEP-THRESHOLD VALUE 'TH'.
+               88  SWEEP-FULL      VALUE 'FL'.
+           05  POOL-THRESHOLD-AMT  PIC S9(13)V99 COMP-3.
+           05  POOL-INT-RATE-TYPE  PIC X(02).
+           05  POOL-CREATED-DATE   PIC X(08).
+           05  POOL-LAST-MAINT     PIC X(08).
+           05  FILLER              PIC X(50).`,
+        explanation: '資金池主檔記錄資金池的基本設定，包括上掃類型、門檻金額等',
+        annotations: [
+          { line: 10, text: 'POOL-STATUS：資金池狀態' },
+          { line: 14, text: 'POOL-SWEEP-TYPE：上掃類型 (零餘額/門檻/全額)' },
+          { line: 18, text: 'POOL-THRESHOLD-AMT：上掃門檻金額' },
+        ],
+      },
+      {
+        title: 'CLM 成員帳戶檔結構',
+        language: 'cobol',
+        code: `      * CLM.POOL.MEMBER - 資金池成員帳戶檔 Copybook
+       01  POOL-MEMBER-RECORD.
+           05  MEM-POOL-ID         PIC X(10).
+           05  MEM-ACCT-NO         PIC X(10).
+           05  MEM-ACCT-NAME       PIC X(50).
+           05  MEM-ACCT-TYPE       PIC X(02).
+               88  MEM-TYPE-MASTER VALUE 'MA'.
+               88  MEM-TYPE-SUB    VALUE 'SB'.
+           05  MEM-STATUS          PIC X(01).
+           05  MEM-RELATIONSHIP    PIC X(02).
+               88  REL-PARENT      VALUE 'PA'.
+               88  REL-CHILD       VALUE 'CH'.
+               88  REL-SIBLING     VALUE 'SI'.
+           05  MEM-SWEEP-RULE.
+               10  MEM-SWEEP-TYPE  PIC X(02).
+               10  MEM-THRESHOLD   PIC S9(13)V99 COMP-3.
+               10  MEM-RESERVE-AMT PIC S9(13)V99 COMP-3.
+           05  MEM-TOPPING-RULE.
+               10  MEM-TOP-ENABLED PIC X(01).
+               10  MEM-TOP-THRESH  PIC S9(13)V99 COMP-3.
+               10  MEM-TOP-AMT     PIC S9(13)V99 COMP-3.
+           05  MEM-LAST-SWEEP-DATE PIC X(08).
+           05  MEM-LAST-TOP-DATE   PIC X(08).
+           05  FILLER              PIC X(30).`,
+        explanation: '成員帳戶檔記錄每個子帳戶的設定，包括上掃規則和下撥規則',
+        annotations: [
+          { line: 7, text: 'MEM-ACCT-TYPE：帳戶類型 (母帳戶/子帳戶)' },
+          { line: 13, text: 'MEM-SWEEP-RULE：上掃規則設定' },
+          { line: 18, text: 'MEM-TOPPING-RULE：下撥規則設定' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q10-1',
+        type: 'single',
+        question: '資金池的主要目的是什麼？',
+        options: [
+          { id: 'a', text: '增加銀行存款' },
+          { id: 'b', text: '集中管理企業資金，提高效率' },
+          { id: 'c', text: '減少銀行帳戶數量' },
+          { id: 'd', text: '降低銀行手續費' },
+        ],
+        correctAnswer: 'b',
+        explanation: '資金池的主要目的是集中管理企業多個帳戶的資金，提高資金使用效率和投資收益。',
+      },
+      {
+        id: 'q10-2',
+        type: 'single',
+        question: '子帳戶的資金如何處理？',
+        options: [
+          { id: 'a', text: '全部轉到母帳戶' },
+          { id: 'b', text: '根據設定的規則自動上掃' },
+          { id: 'c', text: '只能手動轉帳' },
+          { id: 'd', text: '不能轉到母帳戶' },
+        ],
+        correctAnswer: 'b',
+        explanation: '子帳戶的資金會根據設定的上掃規則自動處理，例如超過門檻金額才上掃，或保留一定餘額。',
+      },
+      {
+        id: 'q10-3',
+        type: 'scenario',
+        question: '情境：企業有 5 個子帳戶，每個都有閒置資金，但母帳戶透支。最適合的解決方案是？',
+        options: [
+          { id: 'a', text: '關閉所有子帳戶' },
+          { id: 'b', text: '導入資金池，設定自動上掃和下撥' },
+          { id: 'c', text: '增加母帳戶授信額度' },
+          { id: 'd', text: '將子帳戶資金轉為定期存款' },
+        ],
+        correctAnswer: 'b',
+        explanation: '資金池可以自動將子帳戶的閒置資金上掃到母帳戶，解決母帳戶透支問題，同時保留子帳戶的運作。',
+      },
+    ],
+  },
 ];
