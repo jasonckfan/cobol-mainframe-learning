@@ -993,4 +993,361 @@ SUBJECT: CLM Interest Calc Complete
       },
     ],
   },
+
+  // ========== 第 2 階段：COBOL 檔案處理 (新增 2026-04-12) ==========
+  {
+    id: 'cobol-file-processing',
+    title: 'COBOL 檔案處理',
+    titleEn: 'COBOL File Processing',
+    icon: '📁',
+    stage: 2,
+    context: '學習 OPEN、READ、WRITE、CLOSE 等檔案操作',
+    contextEn: 'Learning file operations: OPEN, READ, WRITE, CLOSE',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'dev', name: '程式設計師', nameEn: 'Developer', avatar: '💻' },
+    ],
+    concepts: [
+      {
+        term: 'Sequential File (循序檔)',
+        termEn: 'Sequential File',
+        explanation: '資料按順序儲存，必須從頭開始讀取，適合批次處理',
+        analogy: '就像錄音帶，要聽第 10 首歌必須先快轉過前 9 首',
+      },
+      {
+        term: 'Indexed File (索引檔)',
+        termEn: 'Indexed File',
+        explanation: '透過鍵值 (Key) 直接存取記錄，類似資料庫索引',
+        analogy: '就像書的目錄，可以直接跳到想看的章節',
+      },
+      {
+        term: 'FILE-CONTROL',
+        termEn: 'FILE-CONTROL',
+        explanation: '在 ENVIRONMENT DIVISION 定義檔案屬性和存取方式',
+        analogy: '就像設定檔案的「使用說明書」，告訴系統怎麼存取這個檔案',
+      },
+      {
+        term: 'File Status',
+        termEn: 'File Status',
+        explanation: '檔案操作的回傳碼，00 表示成功，其他表示各種錯誤狀態',
+        analogy: '就像 HTTP 狀態碼，200 是成功，404 是找不到',
+      },
+    ],
+    dialogues: [
+      { roleId: 'ba', text: 'COBOL 怎麼讀寫檔案？' },
+      { roleId: 'dev', text: '首先要定義檔案控制 (FILE-CONTROL)，告訴系統檔案類型和存取方式。' },
+      { roleId: 'dev', text: '循序檔 (Sequential) 適合批次處理，索引檔 (Indexed) 適合隨機查詢。' },
+      { roleId: 'ba', text: '銀行系統常用哪種？' },
+      { roleId: 'dev', text: '兩種都有。日終批次處理用循序檔，Online 查詢用索引檔 (VSAM)。' },
+      { roleId: 'dev', text: '例如帳戶主檔通常是索引檔，可以用帳號直接查到資料。' },
+      { roleId: 'ba', text: '檔案操作的基本流程是什麼？' },
+      { roleId: 'dev', text: 'OPEN 開檔 → READ/WRITE 讀寫 → CLOSE 關檔。記得檢查 File Status！' },
+      { roleId: 'dev', text: 'READ 時用 AT END 判斷是否讀完，NOT AT END 處理正常資料。' },
+      { roleId: 'ba', text: 'WRITE 和 REWRITE 有什麼差別？' },
+      { roleId: 'dev', text: 'WRITE 是新增記錄，REWRITE 是修改現有記錄。索引檔才能用 REWRITE。' },
+    ],
+    codeExamples: [
+      {
+        title: '循序檔讀取範例',
+        language: 'cobol',
+        code: `       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT TRANS-FILE ASSIGN TO TRANSFILE
+               ORGANIZATION IS SEQUENTIAL
+               FILE STATUS IS WS-TRANS-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  TRANS-FILE.
+       01  TRANS-RECORD.
+           05  TRANS-ID        PIC X(10).
+           05  TRANS-AMOUNT    PIC S9(13)V99 COMP-3.
+           05  TRANS-DATE      PIC X(8).
+
+       WORKING-STORAGE SECTION.
+       01  WS-TRANS-STATUS   PIC X(02).
+       01  WS-EOF            PIC X VALUE 'N'.
+       01  WS-TOTAL-AMT      PIC S9(15)V99 COMP-3 VALUE 0.
+
+       PROCEDURE DIVISION.
+       0000-MAIN.
+           OPEN INPUT TRANS-FILE
+           IF WS-TRANS-STATUS NOT = '00'
+               DISPLAY '開檔失敗: ' WS-TRANS-STATUS
+               GO TO 9999-EXIT
+           END-IF
+
+           PERFORM UNTIL WS-EOF = 'Y'
+               READ TRANS-FILE
+                   AT END
+                       MOVE 'Y' TO WS-EOF
+                   NOT AT END
+                       ADD TRANS-AMOUNT TO WS-TOTAL-AMT
+                       DISPLAY TRANS-ID ' : ' TRANS-AMOUNT
+               END-READ
+           END-PERFORM
+
+           CLOSE TRANS-FILE
+           DISPLAY '總金額: ' WS-TOTAL-AMT
+           .
+
+       9999-EXIT.
+           STOP RUN.`,
+        explanation: '循序檔必須從頭讀到尾，使用 AT END 判斷檔案結束',
+        annotations: [
+          { line: 5, text: 'ORGANIZATION IS SEQUENTIAL：定義為循序檔' },
+          { line: 6, text: 'FILE STATUS：檔案狀態碼' },
+          { line: 26, text: 'OPEN INPUT：以讀取模式開檔' },
+          { line: 32, text: 'READ...AT END...NOT AT END：讀取並判斷結束' },
+        ],
+      },
+      {
+        title: '索引檔 (VSAM) 讀寫範例',
+        language: 'cobol',
+        code: `       ENVIRONMENT DIVISION.
+       FILE-CONTROL.
+           SELECT ACCT-FILE ASSIGN TO ACCTFILE
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS ACCT-NO
+               FILE STATUS IS WS-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ACCT-FILE.
+       01  ACCT-RECORD.
+           05  ACCT-NO         PIC X(10).
+           05  ACCT-NAME       PIC X(50).
+           05  ACCT-BALANCE    PIC S9(13)V99 COMP-3.
+
+       WORKING-STORAGE SECTION.
+       01  WS-STATUS         PIC X(02).
+       01  WS-INPUT-NO       PIC X(10) VALUE '1234567890'.
+
+       PROCEDURE DIVISION.
+       0000-MAIN.
+      *    隨機讀取 (Random Read)
+           OPEN INPUT ACCT-FILE
+           MOVE WS-INPUT-NO TO ACCT-NO
+           READ ACCT-FILE
+               KEY IS ACCT-NO
+               INVALID KEY
+                   DISPLAY '找不到帳號: ' WS-INPUT-NO
+               NOT INVALID KEY
+                   DISPLAY '帳號: ' ACCT-NO
+                   DISPLAY '姓名: ' ACCT-NAME
+                   DISPLAY '餘額: ' ACCT-BALANCE
+           END-READ
+           CLOSE ACCT-FILE
+
+      *    更新記錄 (Update)
+           OPEN I-O ACCT-FILE
+           MOVE WS-INPUT-NO TO ACCT-NO
+           READ ACCT-FILE KEY IS ACCT-NO
+               INVALID KEY
+                   DISPLAY '找不到帳號'
+               NOT INVALID KEY
+                   ADD 1000 TO ACCT-BALANCE
+                   REWRITE ACCT-RECORD
+                       INVALID KEY
+                           DISPLAY '更新失敗'
+                       NOT INVALID KEY
+                           DISPLAY '更新成功'
+                   END-REWRITE
+           END-READ
+           CLOSE ACCT-FILE
+           STOP RUN.`,
+        explanation: '索引檔支援隨機存取 (Random Access)，可用 KEY 直接定位記錄',
+        annotations: [
+          { line: 4, text: 'ORGANIZATION IS INDEXED：索引檔 (VSAM)' },
+          { line: 5, text: 'ACCESS MODE IS DYNAMIC：支援循序和隨機存取' },
+          { line: 6, text: 'RECORD KEY：定義索引鍵值' },
+          { line: 26, text: 'READ...KEY IS：用鍵值直接讀取' },
+          { line: 38, text: 'OPEN I-O：讀寫模式開檔' },
+          { line: 43, text: 'REWRITE：修改現有記錄' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q7-1',
+        type: 'single',
+        question: '循序檔 (Sequential File) 的主要特點是什麼？',
+        options: [
+          { id: 'a', text: '可以用鍵值直接存取任何記錄' },
+          { id: 'b', text: '必須從頭開始依序讀取' },
+          { id: 'c', text: '適合頻繁的隨機查詢' },
+          { id: 'd', text: '只能用於 Online 交易' },
+        ],
+        correctAnswer: 'b',
+        explanation: '循序檔必須從第一筆記錄開始依序讀取，適合批次處理大量資料。',
+      },
+      {
+        id: 'q7-2',
+        type: 'single',
+        question: '索引檔的 RECORD KEY 作用是什麼？',
+        options: [
+          { id: 'a', text: '定義檔案大小' },
+          { id: 'b', text: '作為查詢和排序的依據' },
+          { id: 'c', text: '設定檔案權限' },
+          { id: 'd', text: '指定檔案路徑' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'RECORD KEY 是索引檔的鍵值欄位，用於快速定位和存取記錄。',
+      },
+      {
+        id: 'q7-3',
+        type: 'code-reading',
+        question: '以下程式碼中，OPEN I-O 的意思是什麼？',
+        options: [
+          { id: 'a', text: '唯讀模式' },
+          { id: 'b', text: '唯寫模式' },
+          { id: 'c', text: '讀寫模式（可讀可寫）' },
+          { id: 'd', text: '附加模式' },
+        ],
+        correctAnswer: 'c',
+        explanation: 'OPEN I-O (Input-Output) 表示以讀寫模式開檔，可以讀取和修改記錄。',
+      },
+    ],
+  },
+
+  // ========== 第 3 階段：Copybook 基礎 (新增 2026-04-12) ==========
+  {
+    id: 'copybook-basics',
+    title: 'Copybook 基礎',
+    titleEn: 'Copybook Basics',
+    icon: '📋',
+    stage: 3,
+    context: '學習 Copybook 的用途與語法',
+    contextEn: 'Learning Copybook usage and syntax',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'dev', name: '程式設計師', nameEn: 'Developer', avatar: '💻' },
+    ],
+    concepts: [
+      {
+        term: 'Copybook',
+        termEn: 'Copybook',
+        explanation: '共用的資料結構定義檔，被多個程式 COPY 引用，確保資料格式一致',
+        analogy: '就像共用的「資料規格書」，所有程式都照這個格式讀寫資料',
+      },
+      {
+        term: 'COPY 指令',
+        termEn: 'COPY Statement',
+        explanation: '在編譯時將 Copybook 的內容插入到程式中',
+        analogy: '就像「複製貼上」，把共用的定義插入到自己的程式',
+      },
+      {
+        term: 'REPLACING',
+        termEn: 'REPLACING',
+        explanation: 'COPY 時可以替換欄位名稱前墜，避免命名衝突',
+        analogy: '就像「尋找取代」，把通用的前墜換成自己程式的前墜',
+      },
+    ],
+    dialogues: [
+      { roleId: 'ba', text: '什麼是 Copybook？看到很多程式都有 COPY 語句。' },
+      { roleId: 'dev', text: 'Copybook 是共用的資料結構定義。例如帳戶資料的格式，很多程式都要用。' },
+      { roleId: 'dev', text: '與其在每個程式都寫一遍，不如寫在 Copybook，大家 COPY 來用。' },
+      { roleId: 'ba', text: '這樣有什麼好處？' },
+      { roleId: 'dev', text: '資料格式一改，只要改 Copybook，所有程式自動同步，不會有不一致的問題。' },
+      { roleId: 'dev', text: '例如帳戶主檔加了一個新欄位，改一個 Copybook 就搞定。' },
+      { roleId: 'ba', text: 'REPLACING 是做什麼的？' },
+      { roleId: 'dev', text: '有時不同程式對同一個欄位有不同的命名習慣，REPLACING 可以統一替換前墜。' },
+      { roleId: 'dev', text: '例如 Copybook 用 ACCT-開頭，你的程式想改用 CUST-，就可以用 REPLACING。' },
+      { roleId: 'ba', text: '了解了！Copybook 就像資料格式的「標準規格」。' },
+    ],
+    codeExamples: [
+      {
+        title: 'Copybook 定義範例',
+        language: 'cobol',
+        code: `      * CLMACCT.CPY - 帳戶資料 Copybook
+      * 共用的帳戶主檔資料結構
+       01  ACCT-RECORD.
+           05  ACCT-NO             PIC X(10).
+           05  ACCT-TYPE           PIC X(02).
+               88  ACCT-CHECKING   VALUE 'CH'.
+               88  ACCT-SAVINGS    VALUE 'SV'.
+               88  ACCT-LOAN       VALUE 'LN'.
+           05  ACCT-STATUS         PIC X(01).
+               88  ACCT-ACTIVE     VALUE 'A'.
+               88  ACCT-CLOSED     VALUE 'C'.
+           05  ACCT-OPEN-DATE      PIC X(8).
+           05  ACCT-BALANCE        PIC S9(13)V99 COMP-3.
+           05  ACCT-CREDIT-LIMIT   PIC S9(13)V99 COMP-3.
+           05  ACCT-LAST-TRANS     PIC X(8).
+           05  FILLER              PIC X(20).`,
+        explanation: 'Copybook 只包含資料定義，不包含邏輯。使用 01 Level 定義記錄結構。',
+        annotations: [
+          { line: 3, text: 'Copybook 檔名通常用 .CPY 副檔名' },
+          { line: 5, text: '01 Level 定義記錄名稱' },
+          { line: 8, text: '88 Level 定義條件名稱' },
+        ],
+      },
+      {
+        title: '程式中使用 COPY',
+        language: 'cobol',
+        code: `       DATA DIVISION.
+       FILE SECTION.
+      *    直接 COPY Copybook
+       FD  ACCT-FILE.
+           COPY CLMACCT.
+
+       WORKING-STORAGE SECTION.
+      *    COPY 並替換前墜
+           COPY CLMACCT
+               REPLACING ==ACCT-== BY ==WS-ACCT-==.
+
+      *    COPY 並替換多個前墜
+           COPY CLMACCT
+               REPLACING ==ACCT-== BY ==IN-ACCT-==
+                         ==:ACCT:== BY ==:IN:==.
+
+       PROCEDURE DIVISION.
+       0000-MAIN.
+           OPEN INPUT ACCT-FILE
+           READ ACCT-FILE INTO WS-ACCT-RECORD
+           IF WS-ACCT-STATUS = 'A'
+               DISPLAY '活躍帳戶: ' WS-ACCT-NO
+               DISPLAY '餘額: ' WS-ACCT-BALANCE
+           END-IF
+           CLOSE ACCT-FILE
+           STOP RUN.`,
+        explanation: 'COPY 指令在編譯時展開，REPLACING 可以統一替換欄位前墜',
+        annotations: [
+          { line: 4, text: 'COPY 指令引用 Copybook' },
+          { line: 8, text: 'REPLACING 替換前墜' },
+          { line: 12, text: '可以有多個 REPLACING 子句' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q8-1',
+        type: 'single',
+        question: 'Copybook 的主要用途是什麼？',
+        options: [
+          { id: 'a', text: '儲存程式邏輯' },
+          { id: 'b', text: '共用資料結構定義' },
+          { id: 'c', text: '編譯程式碼' },
+          { id: 'd', text: '執行批次作業' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'Copybook 用於定義共用的資料結構，讓多個程式可以引用相同的格式定義。',
+      },
+      {
+        id: 'q8-2',
+        type: 'single',
+        question: 'REPLACING 子句的作用是什麼？',
+        options: [
+          { id: 'a', text: '刪除不需要的欄位' },
+          { id: 'b', text: '替換欄位名稱前墜' },
+          { id: 'c', text: '修改資料型別' },
+          { id: 'd', text: '增加新欄位' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'REPLACING 用於在 COPY 時統一替換欄位名稱的前墜，避免命名衝突。',
+      },
+    ],
+  },
 ];
