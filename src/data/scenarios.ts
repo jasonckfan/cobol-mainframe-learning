@@ -779,4 +779,218 @@ SUBJECT: CLM Interest Calc Complete
       },
     ],
   },
+
+  // ========== 第 2 階段：COBOL 條件與迴圈 (新增 2026-04-12) ==========
+  {
+    id: 'cobol-control-flow',
+    title: 'COBOL 條件與迴圈',
+    titleEn: 'COBOL Conditions and Loops',
+    icon: '🔀',
+    stage: 2,
+    context: '學習 IF、EVALUATE、PERFORM 等控制流程指令',
+    contextEn: 'Learning IF, EVALUATE, PERFORM control flow statements',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'dev', name: '程式設計師', nameEn: 'Developer', avatar: '💻' },
+    ],
+    concepts: [
+      {
+        term: 'IF 條件判斷',
+        termEn: 'IF Statement',
+        explanation: '根據條件執行不同邏輯，支援 AND、OR、NOT 組合條件',
+        analogy: '就像 Excel 的 IF 函數：如果條件成立就做 A，否則做 B',
+      },
+      {
+        term: 'EVALUATE',
+        termEn: 'EVALUATE Statement',
+        explanation: '多條件分支判斷，類似其他語言的 switch-case',
+        analogy: '就像選擇題，根據不同選項執行不同動作',
+      },
+      {
+        term: 'PERFORM',
+        termEn: 'PERFORM Statement',
+        explanation: '執行段落或迴圈，支援 UNTIL、VARYING、TIMES 等變化',
+        analogy: '就像 VBA 的 For Loop 或 Do While，重複執行某段程式碼',
+      },
+      {
+        term: '段落 (Paragraph)',
+        termEn: 'Paragraph',
+        explanation: 'PROCEDURE DIVISION 中的程式區塊，以句點結尾，可被 PERFORM 呼叫',
+        analogy: '就像 VBA 的 Sub 程序，可以被其他程式呼叫執行',
+      },
+    ],
+    dialogues: [
+      { roleId: 'ba', text: 'COBOL 怎麼寫條件判斷？像 VBA 的 If Then Else 嗎？' },
+      { roleId: 'dev', text: '很像！COBOL 用 IF...THEN...ELSE...END-IF，記得要寫 END-IF 結束。' },
+      { roleId: 'dev', text: '例如：IF WS-BALANCE > 0 THEN ADD WS-AMOUNT TO WS-TOTAL ELSE MOVE 0 TO WS-TOTAL END-IF。' },
+      { roleId: 'ba', text: '那有多個條件怎麼辦？像 VBA 的 Select Case？' },
+      { roleId: 'dev', text: '用 EVALUATE，這是 COBOL 最強大的多條件判斷。可以根據一個值做很多分支。' },
+      { roleId: 'dev', text: '例如：EVALUATE WS-STATUS WHEN 00 DISPLAY 成功 WHEN 01 DISPLAY 找不到 WHEN OTHER DISPLAY 錯誤 END-EVALUATE。' },
+      { roleId: 'ba', text: '迴圈呢？怎麼重複執行？' },
+      { roleId: 'dev', text: '用 PERFORM。最常用的是 PERFORM UNTIL，類似 Do While。' },
+      { roleId: 'dev', text: '還有 PERFORM VARYING，類似 For Loop：PERFORM VARYING WS-I FROM 1 BY 1 UNTIL WS-I > 10。' },
+      { roleId: 'ba', text: 'PERFORM 後面接的是什麼？' },
+      { roleId: 'dev', text: '接的是段落名稱 (Paragraph)。COBOL 把程式分成很多段落，每個段落做一件事，然後用 PERFORM 呼叫。' },
+    ],
+    codeExamples: [
+      {
+        title: 'IF 與 EVALUATE 範例',
+        language: 'cobol',
+        code: `       PROCEDURE DIVISION.
+       0000-MAIN.
+           PERFORM 1000-CHECK-BALANCE
+           PERFORM 2000-PROCESS-STATUS
+           STOP RUN.
+
+       1000-CHECK-BALANCE.
+      *    IF 條件判斷
+           IF WS-BALANCE > 1000000
+               DISPLAY 'VIP 客戶'
+               MOVE 'A' TO WS-CUST-TYPE
+           ELSE IF WS-BALANCE > 0
+               DISPLAY '一般客戶'
+               MOVE 'B' TO WS-CUST-TYPE
+           ELSE
+               DISPLAY '透支客戶'
+               MOVE 'C' TO WS-CUST-TYPE
+           END-IF.
+
+       2000-PROCESS-STATUS.
+      *    EVALUATE 多條件分支
+           EVALUATE WS-STATUS
+               WHEN '00'
+                   DISPLAY '交易成功'
+                   PERFORM 3000-UPDATE-RECORD
+               WHEN '01'
+                   DISPLAY '記錄不存在'
+                   PERFORM 4000-CREATE-RECORD
+               WHEN '51'
+                   DISPLAY '餘額不足'
+                   MOVE 'REJECT' TO WS-RESULT
+               WHEN '99'
+                   DISPLAY '系統錯誤'
+                   PERFORM 9000-ERROR-HANDLER
+               WHEN OTHER
+                   DISPLAY '未知狀態: ' WS-STATUS
+           END-EVALUATE.
+
+       3000-UPDATE-RECORD.
+           DISPLAY '更新記錄中...'.
+
+       4000-CREATE-RECORD.
+           DISPLAY '建立新記錄...'.
+
+       9000-ERROR-HANDLER.
+           DISPLAY '錯誤處理程序'.`,
+        explanation: 'IF 用於條件判斷，EVALUATE 用於多條件分支，段落 (Paragraph) 用於組織程式碼',
+        annotations: [
+          { line: 7, text: 'IF...THEN...ELSE...END-IF 結構' },
+          { line: 19, text: 'EVALUATE...WHEN...END-EVALUATE 結構' },
+          { line: 22, text: 'WHEN 指定特定值' },
+          { line: 31, text: 'WHEN OTHER 處理其他所有情況' },
+          { line: 37, text: '段落以句點結尾，可被 PERFORM 呼叫' },
+        ],
+      },
+      {
+        title: 'PERFORM 迴圈範例',
+        language: 'cobol',
+        code: `       PROCEDURE DIVISION.
+       0000-MAIN.
+      *    PERFORM UNTIL - 類似 Do While
+           MOVE 1 TO WS-COUNTER
+           PERFORM UNTIL WS-COUNTER > 10
+               DISPLAY '第 ' WS-COUNTER ' 次迴圈'
+               ADD 1 TO WS-COUNTER
+           END-PERFORM
+
+      *    PERFORM VARYING - 類似 For Loop
+           PERFORM VARYING WS-I FROM 1 BY 1 UNTIL WS-I > 5
+               COMPUTE WS-SQUARE = WS-I * WS-I
+               DISPLAY WS-I ' 的平方是 ' WS-SQUARE
+           END-PERFORM
+
+      *    PERFORM TIMES - 固定次數
+           PERFORM 3 TIMES
+               DISPLAY '重複執行 3 次'
+           END-PERFORM
+
+      *    PERFORM 呼叫其他段落
+           PERFORM 1000-PROCESS-FILE
+           PERFORM 2000-GENERATE-REPORT
+           STOP RUN.
+
+       1000-PROCESS-FILE.
+           OPEN INPUT ACCT-FILE
+           PERFORM UNTIL WS-EOF = 'Y'
+               READ ACCT-FILE NEXT RECORD
+                   AT END
+                       MOVE 'Y' TO WS-EOF
+                   NOT AT END
+                       ADD 1 TO WS-TOTAL-COUNT
+                       PERFORM 1100-PROCESS-RECORD
+               END-READ
+           END-PERFORM
+           CLOSE ACCT-FILE
+           DISPLAY '總共處理 ' WS-TOTAL-COUNT ' 筆記錄'.
+
+       1100-PROCESS-RECORD.
+      *    處理單筆記錄的邏輯
+           IF ACCT-BALANCE > 0
+               ADD ACCT-BALANCE TO WS-TOTAL-AMT
+           END-IF.
+
+       2000-GENERATE-REPORT.
+           DISPLAY '產生報表中...'
+           DISPLAY '總金額: ' WS-TOTAL-AMT.`,
+        explanation: 'PERFORM UNTIL 類似 Do While，PERFORM VARYING 類似 For Loop，PERFORM TIMES 重複固定次數',
+        annotations: [
+          { line: 3, text: 'PERFORM UNTIL：條件成立時持續迴圈' },
+          { line: 9, text: 'PERFORM VARYING：從初始值遞增/遞減到終值' },
+          { line: 14, text: 'PERFORM TIMES：固定次數迴圈' },
+          { line: 23, text: 'READ...AT END...NOT AT END：檔案讀取迴圈' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q6-1',
+        type: 'single',
+        question: 'COBOL 中，類似 VBA For Loop 的語法是什麼？',
+        options: [
+          { id: 'a', text: 'IF...THEN' },
+          { id: 'b', text: 'PERFORM UNTIL' },
+          { id: 'c', text: 'PERFORM VARYING' },
+          { id: 'd', text: 'EVALUATE' },
+        ],
+        correctAnswer: 'c',
+        explanation: 'PERFORM VARYING 類似 For Loop，可以指定起始值、遞增量和終止條件。',
+      },
+      {
+        id: 'q6-2',
+        type: 'single',
+        question: 'EVALUATE 語句相當於其他程式語言的什麼？',
+        options: [
+          { id: 'a', text: 'If...Else' },
+          { id: 'b', text: 'Switch...Case' },
+          { id: 'c', text: 'For Loop' },
+          { id: 'd', text: 'Try...Catch' },
+        ],
+        correctAnswer: 'b',
+        explanation: 'EVALUATE 類似 switch-case，用於多條件分支判斷，比多個 IF-ELSE 更清晰。',
+      },
+      {
+        id: 'q6-3',
+        type: 'code-reading',
+        question: '以下程式碼會執行幾次 DISPLAY？PERFORM VARYING WS-I FROM 1 BY 2 UNTIL WS-I > 10  DISPLAY WS-I END-PERFORM',
+        options: [
+          { id: 'a', text: '5 次' },
+          { id: 'b', text: '10 次' },
+          { id: 'c', text: '無限迴圈' },
+          { id: 'd', text: '0 次' },
+        ],
+        correctAnswer: 'a',
+        explanation: '從 1 開始，每次加 2，直到大於 10。會顯示 1, 3, 5, 7, 9，共 5 次。',
+      },
+    ],
+  },
 ];
