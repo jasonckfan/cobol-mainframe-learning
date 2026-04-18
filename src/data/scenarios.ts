@@ -1719,4 +1719,174 @@ SUBJECT: CLM Interest Calc Complete
       },
     ],
   },
+
+  // ========== 第 4 階段：掃撥與計息邏輯 (新增 2026-04-18) ==========
+  {
+    id: 'clm-sweeping-interest',
+    title: '掃撥與計息邏輯',
+    titleEn: 'Sweeping and Interest Logic',
+    icon: '📊',
+    stage: 4,
+    context: '學習資金池的掃撥機制與利息計算',
+    contextEn: 'Learning cash pool sweeping mechanism and interest calculation',
+    roles: [
+      { id: 'ba', name: '業務分析師', nameEn: 'Business Analyst', avatar: '👔' },
+      { id: 'dev', name: '程式設計師', nameEn: 'Developer', avatar: '💻' },
+    ],
+    concepts: [
+      {
+        term: 'Sweeping (掃撥)',
+        termEn: 'Sweeping',
+        explanation: '自動將子帳戶資金轉移到母帳戶的動作，分為上掃和下撥',
+        analogy: '就像自動吸塵器，把地上的灰塵自動吸到集塵袋',
+      },
+      {
+        term: 'Auto Sweep (自動上掃)',
+        termEn: 'Auto Sweep',
+        explanation: '子帳戶餘額超過門檻時，自動將超過部分轉到母帳戶',
+        analogy: '就像水桶滿了自動把水導到大水缸',
+      },
+      {
+        term: 'Auto Topping (自動下撥)',
+        termEn: 'Auto Topping',
+        explanation: '子帳戶餘額不足時，自動從母帳戶補充資金',
+        analogy: '就像自動補水機，水位太低時自動補充',
+      },
+      {
+        term: 'Interest Calculation (計息)',
+        termEn: 'Interest Calculation',
+        explanation: '根據每日餘額計算利息，母帳戶和子帳戶可能有不同利率',
+        analogy: '就像銀行存款利息，根據每日存款餘額計算',
+      },
+    ],
+    dialogues: [
+      { roleId: 'ba', text: '請解釋一下掃撥的運作邏輯。' },
+      { roleId: 'dev', text: '掃撥分兩種：上掃是子帳戶錢太多時轉到母帳戶，下撥是子帳戶錢不夠時從母帳戶補充。' },
+      { roleId: 'dev', text: '可以設定門檻，例如子帳戶保留 10 萬，超過才上掃，低於 5 萬才下撥。' },
+      { roleId: 'ba', text: '什麼時候執行？' },
+      { roleId: 'dev', text: '通常是日終批次處理，但也有即時上掃的設計。' },
+      { roleId: 'dev', text: '日終上掃是 Batch Job，晚上跑；即時上掃是 Online 交易，即時處理。' },
+      { roleId: 'ba', text: '計息怎麼算？' },
+      { roleId: 'dev', text: '每日日終根據餘額計算日利息，累計到月終或季終結算。' },
+      { roleId: 'dev', text: '母帳戶和子帳戶可能有不同利率，母帳戶餘額大通常利率較好。' },
+      { roleId: 'ba', text: 'BA 在寫需求時要注意什麼？' },
+      { roleId: 'dev', text: '要明確定義門檻金額、執行頻率、利率類型。這些都會影響程式設計。' },
+    ],
+    codeExamples: [
+      {
+        title: '掃撥判斷邏輯範例',
+        language: 'cobol',
+        code: `       PROCEDURE DIVISION.
+       1000-SWEEP-PROCESS.
+           IF ACCT-BALANCE > MEM-THRESHOLD
+               COMPUTE SWEEP-AMT = ACCT-BALANCE - MEM-RESERVE-AMT
+               IF SWEEP-AMT > 0
+                   PERFORM 1100-DO-SWEEP
+               END-IF
+           END-IF.
+
+       1100-DO-SWEEP.
+           SUBTRACT SWEEP-AMT FROM ACCT-BALANCE
+           ADD SWEEP-AMT TO MASTER-BALANCE
+           MOVE 'SWEEP' TO TRANS-TYPE
+           PERFORM 1200-RECORD-TRANS
+           DISPLAY '上掃完成: ' SWEEP-AMT.
+
+       2000-TOPPING-PROCESS.
+           IF MEM-TOP-ENABLED = 'Y'
+               IF ACCT-BALANCE < MEM-TOP-THRESH
+                   COMPUTE TOP-AMT = MEM-TOP-AMT - ACCT-BALANCE
+                   IF MASTER-BALANCE >= TOP-AMT
+                       PERFORM 2100-DO-TOPPING
+                   END-IF
+               END-IF
+           END-IF.
+
+       2100-DO-TOPPING.
+           SUBTRACT TOP-AMT FROM MASTER-BALANCE
+           ADD TOP-AMT TO ACCT-BALANCE
+           MOVE 'TOPPING' TO TRANS-TYPE
+           PERFORM 1200-RECORD-TRANS
+           DISPLAY '下撥完成: ' TOP-AMT.`,
+        explanation: '上掃判斷餘額是否超過門檻，下撥判斷餘額是否低於門檻且母帳戶有足夠資金',
+        annotations: [
+          { line: 2, text: '檢查餘額是否超過上掃門檻' },
+          { line: 9, text: '執行上掃轉帳' },
+          { line: 17, text: '檢查是否需要下撥' },
+          { line: 26, text: '執行下撥轉帳' },
+        ],
+      },
+      {
+        title: '利息計算範例',
+        language: 'cobol',
+        code: `       PROCEDURE DIVISION.
+       3000-CALC-INTEREST.
+           MOVE POOL-INT-RATE TO WS-RATE
+           COMPUTE WS-DAILY-RATE = WS-RATE / 365
+           COMPUTE WS-DAILY-INT = ACCT-BALANCE * WS-DAILY-RATE
+           ADD WS-DAILY-INT TO ACCT-ACCUM-INT
+           DISPLAY '日利息: ' WS-DAILY-INT.
+
+       3100-MONTHLY-SETTLEMENT.
+           IF WS-DAY = '01'
+               MOVE ACCT-ACCUM-INT TO WS-TOTAL-INT
+               ADD WS-TOTAL-INT TO ACCT-BALANCE
+               MOVE 0 TO ACCT-ACCUM-INT
+               PERFORM 3200-GEN-STATEMENT
+               DISPLAY '月終結算: ' WS-TOTAL-INT.
+
+       3200-GEN-STATEMENT.
+           WRITE INT-STATEMENT-RECORD FROM WS-INT-DETAIL
+           MOVE WS-POOL-ID TO ST-POOL-ID
+           MOVE WS-ACCT-NO TO ST-ACCT-NO
+           MOVE WS-TOTAL-INT TO ST-INT-AMT.`,
+        explanation: '每日計算日利息並累計，月終時結算並入帳',
+        annotations: [
+          { line: 4, text: '計算日利息 = 餘額 × 日利率' },
+          { line: 10, text: '月終結算，利息入帳' },
+        ],
+      },
+    ],
+    quiz: [
+      {
+        id: 'q11-1',
+        type: 'single',
+        question: '自動上掃的觸發條件是什麼？',
+        options: [
+          { id: 'a', text: '子帳戶餘額低於門檻' },
+          { id: 'b', text: '子帳戶餘額超過門檻' },
+          { id: 'c', text: '母帳戶透支' },
+          { id: 'd', text: '每日固定時間' },
+        ],
+        correctAnswer: 'b',
+        explanation: '當子帳戶餘額超過設定的門檻金額時，會自動將超過部分上掃到母帳戶。',
+      },
+      {
+        id: 'q11-2',
+        type: 'single',
+        question: '日終上掃和即時上掃的主要差別是什麼？',
+        options: [
+          { id: 'a', text: '金額限制不同' },
+          { id: 'b', text: '執行時間不同，日終是 Batch，即時是 Online' },
+          { id: 'c', text: '利率計算不同' },
+          { id: 'd', text: '手續費不同' },
+        ],
+        correctAnswer: 'b',
+        explanation: '日終上掃是批次處理 (Batch Job)，在晚上執行；即時上掃是聯機交易 (Online)，即時處理。',
+      },
+      {
+        id: 'q11-3',
+        type: 'code-reading',
+        question: 'COMPUTE WS-DAILY-INT = ACCT-BALANCE * WS-DAILY-RATE 計算的是什麼？',
+        options: [
+          { id: 'a', text: '月利息' },
+          { id: 'b', text: '日利息' },
+          { id: 'c', text: '年利息' },
+          { id: 'd', text: '手續費' },
+        ],
+        correctAnswer: 'b',
+        explanation: '使用日利率 (DAILY-RATE) 計算，所以是日利息。',
+      },
+    ],
+  },
 ];
